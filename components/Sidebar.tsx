@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { RepairSession, User } from '../types';
 
 interface SidebarProps {
@@ -12,8 +12,11 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ sessions, activeSessionId, onSelectSession, onNewRepair, user, onLogout }) => {
-  return (
-    <div className="w-80 bg-[#0d0d0e] border-r border-zinc-800 flex flex-col h-full shrink-0">
+  const [open, setOpen] = useState(false);
+
+  // Sidebar content as a function for reuse
+  const sidebarContent = (
+    <div className="flex flex-col h-full">
       <div className="p-6">
         <div className="flex items-center gap-3 mb-10">
           <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-900/20">
@@ -99,6 +102,52 @@ const Sidebar: React.FC<SidebarProps> = ({ sessions, activeSessionId, onSelectSe
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {/* Mobile Hamburger Button */}
+      <button
+        className="fixed top-4 left-4 z-40 flex items-center justify-center w-10 h-10 bg-orange-600 rounded-xl shadow-lg shadow-orange-900/20 text-white sm:hidden"
+        onClick={() => setOpen(true)}
+        aria-label="Open sidebar"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      {/* Sidebar Overlay for Mobile */}
+      <div
+        className={`fixed inset-0 z-30 bg-black/40 transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} sm:hidden`}
+        onClick={() => setOpen(false)}
+        aria-label="Close sidebar overlay"
+      />
+
+      {/* Sidebar Drawer for Mobile */}
+      <aside
+        className={`fixed top-0 left-0 z-50 h-full w-72 bg-[#0d0d0e] border-r border-zinc-800 shadow-2xl transform transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'} sm:hidden flex flex-col`}
+        style={{ maxWidth: '90vw' }}
+        aria-label="Sidebar drawer"
+      >
+        {/* Close button */}
+        <button
+          className="absolute top-4 right-4 z-50 flex items-center justify-center w-8 h-8 bg-zinc-800 rounded-full text-white"
+          onClick={() => setOpen(false)}
+          aria-label="Close sidebar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        {sidebarContent}
+      </aside>
+
+      {/* Sidebar for Desktop */}
+      <aside className="hidden sm:flex w-80 bg-[#0d0d0e] border-r border-zinc-800 flex-col h-full shrink-0">
+        {sidebarContent}
+      </aside>
+    </>
   );
 };
 

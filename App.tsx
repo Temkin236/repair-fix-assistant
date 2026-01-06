@@ -170,24 +170,26 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-8 bg-gradient-to-t from-[#050505] to-transparent">
-          <div className="max-w-3xl mx-auto relative">
-            <div className="relative bg-[#111112] border border-white/5 rounded-2xl p-2.5 shadow-3xl focus-within:border-orange-500/30 transition-all">
-              <div className="flex items-end gap-3 px-3">
-                <textarea 
+        <div className="p-3 sm:p-6 md:p-8 bg-gradient-to-t from-[#050505] to-transparent">
+          <div className="max-w-full sm:max-w-2xl md:max-w-3xl mx-auto relative">
+            <div className="relative bg-[#111112] border border-white/5 rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 shadow-3xl focus-within:border-orange-500/30 transition-all">
+              <div className="flex items-end gap-2 sm:gap-3 px-2 sm:px-3">
+                <textarea
                   rows={1}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
                   placeholder="Identify your device (e.g. PlayStation 5 DualSense Controller)"
-                  className="w-full bg-transparent border-none focus:ring-0 text-sm font-medium py-3 px-2 resize-none text-white placeholder-zinc-700"
+                  className="w-full bg-transparent border-none focus:ring-0 text-base sm:text-sm font-medium py-3 px-2 sm:py-3 sm:px-2 resize-none text-white placeholder-zinc-700 rounded-lg sm:rounded-xl"
+                  style={{ minHeight: '44px' }}
                 />
-                <button 
+                <button
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
-                  className="mb-1 p-3 bg-orange-600 text-white rounded-xl hover:bg-orange-500 disabled:bg-zinc-900 disabled:text-zinc-700 transition-all shadow-xl shadow-orange-900/20 active:scale-95"
+                  className="mb-1 p-3 sm:p-3 bg-orange-600 text-white rounded-lg sm:rounded-xl hover:bg-orange-500 disabled:bg-zinc-900 disabled:text-zinc-700 transition-all shadow-xl shadow-orange-900/20 active:scale-95 flex items-center justify-center"
+                  style={{ minWidth: '44px', minHeight: '44px' }}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" style={{ transform: 'rotate(90deg)' }}>
                     <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                   </svg>
                 </button>
