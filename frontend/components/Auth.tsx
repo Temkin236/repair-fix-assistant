@@ -14,20 +14,33 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onBack }) => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleAuth = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate API logic
-    setTimeout(() => {
-      onLogin({
-        id: Math.random().toString(),
-        email,
-        name: name || email.split('@')[0],
-        tokensUsed: 0,
-        repairsCompleted: 0
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/auth/${isLogin ? 'login' : 'register'}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, ...(isLogin ? {} : { name }) })
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Authentication failed');
+      // Store JWT in localStorage
+      localStorage.setItem('token', data.token);
+      // You may want to decode the user from the token or backend can return user info
+      onLogin({
+        id: data.user?.id || email,
+        email,
+        name: data.user?.name || name || email.split('@')[0],
+        tokensUsed: data.user?.tokensUsed || 0,
+        repairsCompleted: data.user?.repairsCompleted || 0
+      });
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (

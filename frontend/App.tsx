@@ -5,7 +5,7 @@ import Sidebar from './components/Sidebar';
 import ChatMessage from './components/ChatMessage';
 import Auth from './components/Auth';
 import LandingPage from './components/LandingPage';
-import { RepairAgent } from './services/geminiService';
+// import { RepairAgent } from './services/geminiService';
 
 const App: React.FC = () => {
   const [view, setView] = useState<'landing' | 'auth' | 'app'>('landing');
@@ -25,7 +25,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const agentRef = useRef<RepairAgent>(new RepairAgent());
+
 
   // Routing and Init Logic
   useEffect(() => {
@@ -57,35 +57,36 @@ const App: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const history = messages.slice(-8).map(m => ({
-        role: m.role === 'assistant' ? 'model' : m.role,
-        parts: [{ text: m.content }]
-      }));
+      setStatus('Contacting backend...');
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ message: input })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Chat failed');
 
-      const result = await agentRef.current.processRequest(input, history, (s) => setStatus(s));
-      
-      if (result) {
-        const assistantMsg: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: result.text || "Manual not found. Please specify the exact model.",
-          timestamp: new Date(),
-          metadata: {
-            toolName: result.tool,
-            verifiedSource: result.source,
-            safetyLevel: result.text?.toLowerCase().includes('warning') || result.text?.toLowerCase().includes('caution') ? 'warning' : 'safe'
-          }
-        };
-        
-        setMessages(prev => [...prev, assistantMsg]);
-        setUser(curr => curr ? {
-          ...curr,
-          tokensUsed: curr.tokensUsed + (result.tokens || 0),
-          repairsCompleted: result.source?.includes('iFixit') ? curr.repairsCompleted + 1 : curr.repairsCompleted
-        } : null);
-      }
-    } catch (err) {
-      console.error(err);
+      const assistantMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: data.response || data.message || 'No response from backend.',
+        timestamp: new Date(),
+        metadata: {
+          // Optionally fill with backend data if available
+        }
+      };
+      setMessages(prev => [...prev, assistantMsg]);
+    } catch (err: any) {
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 2).toString(),
+        role: 'assistant',
+        content: err.message || 'Error contacting backend.',
+        timestamp: new Date()
+      }]);
     } finally {
       setIsLoading(false);
       setStatus(null);
