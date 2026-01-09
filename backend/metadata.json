@@ -1,8 +1,0 @@
-
-{
-  "name": "FixMaster Pro - Verified AI Repair Assistant",
-  "description": "A high-precision repair platform integrating the iFixit API for official documentation and safety-first repair guidance.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}
